@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<form>
+    <h1>Author's entry</h1>
+<label for="name">author name</label>
+<input type="text" id="name">
+<input type="submit" id="btn1">
+<br><br>
+</form>
+
+<form>
+    <h1>Book's entry</h1>
+<label for="name">author id</label>
+<input type="id" id="id">
+<label for="name">book name</label>
+<input type="text" id="bname">
+<label for="name">ISBN</label>
+<input type="text" id="isbn">
+<input type="submit" id="btn2">
+</form>
+
+<button id="get_books">get author details</button>
+<li id="authordetails"></li>
+<button id="get_author">get books details</button>
+<li id="booksdetails"></li>
+
+<label for="booksdetails">Get By Author Id</label>
+<input type="text" id="bbaid">
+<input type="submit" id="sbbaid">
+<li id="findbooksdetails"></li>
+
+<label for="booksdetails">Get By book Id (isbn)</label>
+<input type="text" id="getbookbyIsbn">
+<input type="submit" id="gbbIsbn" >
+<ul id="findauthordetails"></ul>
+
+<label for="booksdetails">Get By Author Id</label>
+<input type="text" id="delete">
+<input type="submit" id="deleteByAuthorId">
+
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"></script>
+<script>
+
+
+
+document.getElementById('btn1').addEventListener('click', getauthor)
+function getauthor(e){
+    e.preventDefault();
+    const name=document.getElementById('name')
+
+    const obj={
+        name:name.value
+    }
+axios.post('http://localhost:3000/author', obj).then(()=>{alert('saved in database')})
+.catch((err)=>{alert('duplicate entry not allowed')})
+}
+
+
+
+document.getElementById('btn2').addEventListener('click',getbook)
+function getbook(e){
+    e.preventDefault();
+    const id=document.getElementById('id')
+    const name=document.getElementById('bname')
+    const isbn=document.getElementById('isbn')
+
+    const obj1={
+        id:id.value,
+        name:name.value,
+        isbn:isbn.value
+    }
+ 
+    axios.post('http://localhost:3000/book', obj1).then(()=>{alert("books details saved")})
+    .catch((err)=>{alert('duplicate isbn not allowed')})
+
+
+}
+
+
+document.getElementById('get_books').addEventListener('click',getbookdetails1)
+function getbookdetails1(e){
+    e.preventDefault();
+    var li=document.getElementById('authordetails')
+    axios.get('http://localhost:3000/author').then((res)=>{
+        const temp=res.data.data.split(',')
+       
+        console.log(temp)
+        for(var i=0;i<temp.length;i++)
+        {
+        var ul=document.createElement('ul')
+        ul.appendChild(document.createTextNode(`${temp[i]}`))
+        li.appendChild(ul)
+
+        }
+
+    })
+}
+document.getElementById('get_author').addEventListener('click',getbookdetails)
+function getbookdetails(e){
+    e.preventDefault();
+   
+    var li=document.getElementById('booksdetails')
+     axios.get('http://localhost:3000/book').then((res)=>{
+        console.log(res)
+        const temp=res.data.data.split(',')
+       
+        console.log(temp)
+        for(var i=0;i<temp.length;i++)
+        {
+        var ul=document.createElement('ul')
+        ul.appendChild(document.createTextNode(`${temp[i]}`))
+        li.appendChild(ul)
+
+        }
+     })
+
+    }
+    document.getElementById('sbbaid').addEventListener('click', getauthorbid)
+function getauthorbid(e){
+    e.preventDefault();
+    const name=document.getElementById('bbaid').value
+
+    // const obj={
+    //     name:name.value
+    // }
+axios.get(`http://localhost:3000/author/${name}`).then((res)=>{
+    var li=document.getElementById('findbooksdetails')
+    const temp=res.data.data.split(',')
+       
+       console.log(temp)
+       for(var i=0;i<temp.length;i++)
+       {
+       var ul=document.createElement('ul')
+       ul.appendChild(document.createTextNode(`${temp[i]}`))
+       li.appendChild(ul)
+
+       }
+
+})
+
+}
+    
+document.getElementById('gbbIsbn').addEventListener('click', getbookbid)
+function getbookbid(e){
+    e.preventDefault();
+    const isbn=document.getElementById('getbookbyIsbn').value
+    
+
+    // const obj={
+    //     name:name.value
+    // }
+ axios.get(`http://localhost:3000/book/${isbn}`).then((res)=>{
+    var ul=document.getElementById('findauthordetails')
+    const temp=res.data.data.split(',')      
+       //console.log(temp)
+       for(var i=0;i<temp.length;i++)
+       {
+       var li=document.createElement('li')
+       li.appendChild(document.createTextNode(`${temp[i]}`))
+       ul.appendChild(li)
+
+       }
+
+ })
+
+}
+document.getElementById('deleteByAuthorId').addEventListener('click',(e)=>{
+    e.preventDefault()
+    const isbn=document.getElementById('delete').value
+
+    axios.delete(`http://localhost:3000/book/${isbn}`)
+})
+
+
+</script>
+</body> 
+
+</html>
